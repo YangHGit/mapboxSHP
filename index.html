@@ -7,14 +7,15 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
     <style>
-        body { margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-        .layer-control, .legend { position: absolute; background: white; padding: 10px; font-family: Arial, sans-serif; }
-        .layer-control { top: 10px; left: 10px; }
-        .legend { bottom: 10px; left: 10px; }
-        .legend div { display: flex; align-items: center; }
-        .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
-    </style>
+            body { margin: 0; padding: 0; }
+            #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+            .layer-control, .legend { position: absolute; background: rgba(255, 255, 255, 0.8); padding: 10px; font-family: Arial, sans-serif; }
+            .layer-control { top: 20px; left: 20px; z-index: 1; }
+            .legend { bottom: 20px; left: 20px; z-index: 1; }
+            .layer-control h1, .legend h3 { margin-top: 0; }
+            .legend div { display: flex; align-items: center; }
+            .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+        </style>
 </head>
 <body>
 <div id="map"></div>
@@ -41,7 +42,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [-3.476959646569138, 56.407104978623074], // 初始中心点
-    zoom: 10 // 初始缩放级别
+    zoom: 11 // 初始缩放级别
 });
 
 // 定义加载GeoJSON数据的函数
@@ -66,6 +67,20 @@ map.on('load', function() {
                 'fill-opacity': 0.6
             }
         });
+            // 添加弹窗
+            map.on('mouseenter', 'layer2015', function(e) {
+            var address = e.features[0].properties.ADDRESS;
+        
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML('<h3>Address: ' + address + '</h3><h3>Year: 2015</h3>')
+                .addTo(map);
+        });
+        
+        map.on('mouseleave', 'layer2015', function() {
+            map.getCanvas().style.cursor = '';
+        });
+        
     
     });
 
@@ -83,6 +98,19 @@ map.on('load', function() {
                 'fill-opacity': 0.6
             }
         });
+         // 添加弹窗
+         map.on('mouseenter', 'layer2019', function(e) {
+            var address = e.features[0].properties.ADDRESS;
+            var year = e.features[0].properties.year;
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML('<h3>Address: ' + address + '</h3><h3>Year: 2019</h3>')
+                .addTo(map);
+        });
+        
+        map.on('mouseleave', 'layer2019', function() {
+            map.getCanvas().style.cursor = '';
+        });
     });
 
     // 加载并添加2022年的GeoJSON图层
@@ -98,6 +126,19 @@ map.on('load', function() {
                 'fill-color': '#0000FF',
                 'fill-opacity': 0.6
             }
+        });
+        // 添加弹窗
+        map.on('mouseenter', 'layer2022', function(e) {
+            var address = e.features[0].properties.Address;
+            var year = e.features[0].properties.year;
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML('<h3>Address: ' + address + '</h3><h3>Year: 2022</h3>')
+                .addTo(map);
+        });
+        
+        map.on('mouseleave', 'layer2022', function() {
+            map.getCanvas().style.cursor = '';
         });
         console.log('2022 layer added'); // 确认消息
     });
