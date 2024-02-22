@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Map with GeoJSON Layers</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .layer-control, .legend { position: absolute; background: white; padding: 10px; font-family: Arial, sans-serif; }
+        .layer-control { top: 10px; left: 10px; }
+        .legend { bottom: 10px; left: 10px; }
+        .legend div { display: flex; align-items: center; }
+        .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div class="layer-control">
+    <h1>Layer Control</h1>
+    <input type="checkbox" id="layer2015" checked>
+    <label for="layer2015">2015</label><br>
+    <input type="checkbox" id="layer2019" checked>
+    <label for="layer2019">2019</label><br>
+    <input type="checkbox" id="layer2022" checked>
+    <label for="layer2022">2022</label>
+</div>
+<div class="legend">
+    <h3>Legend</h3>
+    <div><i style="background: #FF0000;"></i>2015</div>
+    <div><i style="background: #00FF00;"></i>2019</div>
+    <div><i style="background: #0000FF;"></i>2022</div>
+</div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiMTMyOTAyMjYyNjkiLCJhIjoiY2xyZ2ZocHU4MGdvZjJqbzVnaWt2Z255ZiJ9.FjjPrPc_VXxBUD9nrToOEg'; // Replace with your Mapbox access token
+
+
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [-3.476959646569138, 56.407104978623074], // 初始中心点
+    zoom: 10 // 初始缩放级别
+});
+
+// 定义加载GeoJSON数据的函数
+function loadGeoJSON(url) {
+    return fetch(url).then(function(response) {
+        return response.json();
+    });
+}
+
+map.on('load', function() {
+    // 加载并添加2015年的GeoJSON图层
+    loadGeoJSON('http://192.168.0.105:8081/output_2015.geojson').then(function(geojson2015) {
+        map.addLayer({
+            'id': 'layer2015',
+            'type': 'fill',
+            'source': {
+                'type': 'geojson',
+                'data': geojson2015
+            },
+            'paint': {
+                'fill-color': '#FF0000',
+                'fill-opacity': 0.6
+            }
+        });
+    
+    });
+
+    // 加载并添加2019年的GeoJSON图层
+    loadGeoJSON('http://192.168.0.105:8081/output_2019.geojson').then(function(geojson2019) {
+        map.addLayer({
+            'id': 'layer2019',
+            'type': 'fill',
+            'source': {
+                'type': 'geojson',
+                'data': geojson2019
+            },
+            'paint': {
+                'fill-color': '#00FF00',
+                'fill-opacity': 0.6
+            }
+        });
+    });
+
+    // 加载并添加2022年的GeoJSON图层
+    loadGeoJSON('http://192.168.0.105:8081/output_2022.geojson').then(function(geojson2022) {
+        map.addLayer({
+            'id': 'layer2022',
+            'type': 'fill',
+            'source': {
+                'type': 'geojson',
+                'data': geojson2022
+            },
+            'paint': {
+                'fill-color': '#0000FF',
+                'fill-opacity': 0.6
+            }
+        });
+        console.log('2022 layer added'); // 确认消息
+    });
+
+
+
+    // 切换图层的可见性
+    var toggleableLayers = ['layer2015', 'layer2019', 'layer2022'];
+    toggleableLayers.forEach(function(id) {
+        var checkbox = document.getElementById(id);
+        checkbox.addEventListener('change', function(e) {
+            map.setLayoutProperty(id, 'visibility', e.target.checked ? 'visible' : 'none');
+        });
+    });
+});
+</script>
+</body>
+</html>
